@@ -1,5 +1,10 @@
 # oura-mcp
 
+[![CI](https://github.com/Rajskij/oura-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Rajskij/oura-mcp/actions/workflows/ci.yml)
+[![Docker](https://img.shields.io/badge/ghcr.io-oura--mcp-2496ED?logo=docker&logoColor=white)](https://github.com/Rajskij/oura-mcp/pkgs/container/oura-mcp)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen?logo=node.js&logoColor=white)](package.json)
+
 **Ask your Oura Ring anything. In ChatGPT or Claude, in any language.**
 
 A remote MCP server that connects Oura Ring data to any MCP client. No UI, no app, no model of its own: the assistant you already pay for calls the tools and explains your data in whatever language you speak.

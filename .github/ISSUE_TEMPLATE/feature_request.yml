@@ -1,0 +1,22 @@
+name: Feature request
+description: An idea for a tool, an endpoint, or anything else
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to ask your ring?
+      description: Describe the question or workflow, not the implementation. "I want to ask ChatGPT X and get Y."
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Proposed solution (optional)
+      description: If you have an idea how this maps to Oura API data or a new tool, sketch it here.
+  - type: checkboxes
+    id: hosted
+    attributes:
+      label: Hosted version interest
+      options:
+        - label: I'd use a hosted version of this (connect Oura with one click, nothing to deploy)

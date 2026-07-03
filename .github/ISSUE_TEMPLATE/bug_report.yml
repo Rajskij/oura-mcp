@@ -1,0 +1,43 @@
+name: Bug report
+description: Something doesn't work
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security issue? Please use [private vulnerability reporting](https://github.com/Rajskij/oura-mcp/security/advisories/new) instead of a public issue.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, what did you expect, what happened instead?
+      placeholder: Asked ChatGPT about sleep, the tool call returned...
+    validations:
+      required: true
+  - type: dropdown
+    id: setup
+    attributes:
+      label: How do you run the server
+      options:
+        - Docker (ghcr.io image)
+        - Docker (built locally)
+        - Node directly
+        - Sandbox mode (OURA_SANDBOX=1)
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: MCP client
+      options:
+        - ChatGPT (Developer mode connector)
+        - Claude (custom connector)
+        - Other / curl
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Server output around the failure. Double-check nothing sensitive (tokens, your MCP path) is included.
+      render: text
