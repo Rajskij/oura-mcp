@@ -1,0 +1,38 @@
+name: uptime
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check healthz
+        run: |
+          for i in 1 2 3; do
+            curl -sf --max-time 10 https://oura-mcp.duckdns.org/healthz > /dev/null && exit 0
+            echo "attempt $i failed"
+            sleep 20
+          done
+          exit 1
+
+      - name: File an issue (once) on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          OPEN=$(gh issue list --label uptime --state open --json number --jq 'length')
+          if [ "$OPEN" = "0" ]; then
+            gh issue create \
+              --title "Production healthz is down ($(date -u '+%Y-%m-%d %H:%M') UTC)" \
+              --label uptime \
+              --body "Three consecutive healthz checks failed from GitHub Actions. Check the box: service status, Caddy, DuckDNS IP, Oracle instance state. Close this issue once resolved."
+          else
+            echo "uptime issue already open, not filing another"
+          fi

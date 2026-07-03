@@ -1,0 +1,14 @@
+[Unit]
+Description=oura-mcp MCP server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=${APP_USER}
+WorkingDirectory=${APP_DIR}
+ExecStart=/usr/bin/node dist/src/index.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

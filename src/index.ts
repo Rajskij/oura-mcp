@@ -2,8 +2,10 @@ import { serve } from '@hono/node-server';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { toFetchResponse, toReqRes } from 'fetch-to-node';
 import { Hono } from 'hono';
-import { config } from './config.js';
+import { assertConfig, config } from './config.js';
 import { buildServer } from './server.js';
+
+assertConfig();
 
 const app = new Hono();
 const mcpPath = `/mcp/${config.mcpPathSecret}`;
