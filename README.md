@@ -81,4 +81,4 @@ Phase 2 (if real demand shows up): hosted multi-tenant with one-click Oura OAuth
 
 ## License
 
-MIT (added with the first public release).
+[MIT](LICENSE)
