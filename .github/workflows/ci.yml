@@ -34,6 +34,58 @@ jobs:
       - name: Smoke test against Oura sandbox
         run: npm run smoke
 
+  deploy:
+    # Ship to the production box only for commits that landed on main and passed checks.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: checks
+    runs-on: ubuntu-latest
+    concurrency: production
+    env:
+      BOX: ubuntu@157.151.235.170
+      APP_DIR: /home/ubuntu/oura-mcp
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build artifact (runner arch matches the box)
+        run: |
+          npm ci
+          npm run build
+          npm ci --omit=dev
+          tar czf /tmp/oura-mcp.tgz dist node_modules package.json package-lock.json
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "157.151.235.170 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFbmfexKUOtoVqY7RUfJWMm7IW0oyy4n4IgoXdZrUMoJ" > ~/.ssh/known_hosts
+
+      - name: Deploy and restart
+        run: |
+          scp -i ~/.ssh/deploy_key /tmp/oura-mcp.tgz "$BOX:/tmp/oura-mcp.tgz"
+          ssh -i ~/.ssh/deploy_key "$BOX" "
+            set -e
+            rm -rf $APP_DIR/dist $APP_DIR/node_modules
+            tar xzf /tmp/oura-mcp.tgz -C $APP_DIR
+            rm /tmp/oura-mcp.tgz
+            sudo systemctl restart oura-mcp
+          "
+
+      - name: Verify health
+        run: |
+          for i in $(seq 1 10); do
+            if curl -sf https://oura-mcp.duckdns.org/healthz > /dev/null; then
+              echo "healthz OK"; exit 0
+            fi
+            sleep 3
+          done
+          echo "healthz did not come back after deploy"; exit 1
+
   docker:
     # Publish the image only for commits that landed on main and passed checks.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
