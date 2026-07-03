@@ -4,16 +4,37 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 5
+    # Let releases settle before proposing them: a week for minors,
+    # a month for majors. Fresh .0 releases are not our job to beta-test.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Types must match the runtime; we deliberately run Node 22 LTS.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 3
+    cooldown:
+      default-days: 7
+    ignore:
+      # Node majors are a deliberate decision, not a checkbox.
+      # Revisit when Node 26 reaches LTS (October 2026).
+      - dependency-name: 'node'
+        update-types: ['version-update:semver-major']
