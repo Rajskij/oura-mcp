@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { z } from 'zod';
 import { ouraGetAll } from '../providers/oura.js';
 import { errorResult, jsonResult, runTool } from './helpers.js';
 
@@ -37,10 +37,7 @@ export function registerHeartrateTools(server: McpServer): void {
           .string()
           .optional()
           .describe('Range start, ISO 8601 (e.g. 2026-07-02T00:00:00Z). Default: 24 hours ago.'),
-        end_datetime: z
-          .string()
-          .optional()
-          .describe('Range end, ISO 8601. Default: now.'),
+        end_datetime: z.string().optional().describe('Range end, ISO 8601. Default: now.'),
       },
       annotations: { readOnlyHint: true },
     },
@@ -51,9 +48,7 @@ export function registerHeartrateTools(server: McpServer): void {
           ? new Date(start_datetime)
           : new Date(end.getTime() - 24 * 60 * 60 * 1000);
         if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-          return errorResult(
-            'Invalid datetime. Use ISO 8601, e.g. 2026-07-02T00:00:00Z.',
-          );
+          return errorResult('Invalid datetime. Use ISO 8601, e.g. 2026-07-02T00:00:00Z.');
         }
         if (end.getTime() - start.getTime() > MAX_RANGE_MS) {
           return errorResult(

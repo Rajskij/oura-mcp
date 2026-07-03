@@ -48,10 +48,7 @@ async function ensureAccessToken(): Promise<string> {
   return tokens.access_token;
 }
 
-export async function ouraGet<T>(
-  path: string,
-  params: Record<string, string> = {},
-): Promise<T> {
+export async function ouraGet<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const token = await ensureAccessToken();
   const url = new URL(`${OURA_API_BASE}/${path}`);
   for (const [key, value] of Object.entries(params)) {

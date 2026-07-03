@@ -13,11 +13,7 @@ export const dateParams = {
     .regex(DATE_RE)
     .optional()
     .describe('First day, YYYY-MM-DD. Default: 7 days ago.'),
-  end_date: z
-    .string()
-    .regex(DATE_RE)
-    .optional()
-    .describe('Last day, YYYY-MM-DD. Default: today.'),
+  end_date: z.string().regex(DATE_RE).optional().describe('Last day, YYYY-MM-DD. Default: today.'),
 };
 
 export const responseFormatParam = z
@@ -78,8 +74,7 @@ export async function runTool(
   try {
     result = await fn();
   } catch (err) {
-    const message =
-      err instanceof OuraApiError ? err.message : `Unexpected error: ${String(err)}`;
+    const message = err instanceof OuraApiError ? err.message : `Unexpected error: ${String(err)}`;
     result = errorResult(message);
   }
   logUsage({

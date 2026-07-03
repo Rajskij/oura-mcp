@@ -36,16 +36,10 @@ app.onError((err, c) => {
 
 // No sessions to resume or terminate in stateless mode.
 app.get(mcpPath, (c) =>
-  c.json(
-    { jsonrpc: '2.0', error: { code: -32000, message: 'Method not allowed' }, id: null },
-    405,
-  ),
+  c.json({ jsonrpc: '2.0', error: { code: -32000, message: 'Method not allowed' }, id: null }, 405),
 );
 app.delete(mcpPath, (c) =>
-  c.json(
-    { jsonrpc: '2.0', error: { code: -32000, message: 'Method not allowed' }, id: null },
-    405,
-  ),
+  c.json({ jsonrpc: '2.0', error: { code: -32000, message: 'Method not allowed' }, id: null }, 405),
 );
 
 app.get('/healthz', (c) => c.text('ok'));
