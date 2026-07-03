@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
     "start": "node dist/src/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
@@ -27,6 +28,7 @@
     "@biomejs/biome": "2.5.2",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.9"
   }
 }

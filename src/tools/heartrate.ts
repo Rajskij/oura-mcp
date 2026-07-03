@@ -11,16 +11,47 @@ import { errorResult, jsonResult, runTool } from './helpers.js';
 
 const MAX_RANGE_MS = 3 * 24 * 60 * 60 * 1000;
 
-interface HeartRateSample {
+export interface HeartRateSample {
   bpm: number;
   source: string;
   timestamp: string;
 }
 
+export interface HourlyHeartRate {
+  hour: string;
+  avg_bpm: number;
+  min_bpm: number;
+  max_bpm: number;
+  samples: number;
+}
+
 /** Oura wants ISO 8601 with an explicit offset; normalize whatever we got. */
-function toOuraDatetime(input: string | Date): string {
+export function toOuraDatetime(input: string | Date): string {
   const d = input instanceof Date ? input : new Date(input);
   return d.toISOString().slice(0, 19) + '+00:00';
+}
+
+/** Bucket raw samples into chronologically sorted hourly stats. */
+export function aggregateHourly(samples: HeartRateSample[]): HourlyHeartRate[] {
+  const byHour = new Map<string, { sum: number; min: number; max: number; n: number }>();
+  for (const s of samples) {
+    const hour = s.timestamp.slice(0, 13) + ':00Z';
+    const agg = byHour.get(hour) ?? { sum: 0, min: Infinity, max: -Infinity, n: 0 };
+    agg.sum += s.bpm;
+    agg.min = Math.min(agg.min, s.bpm);
+    agg.max = Math.max(agg.max, s.bpm);
+    agg.n += 1;
+    byHour.set(hour, agg);
+  }
+  return [...byHour.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([hour, a]) => ({
+      hour,
+      avg_bpm: Math.round(a.sum / a.n),
+      min_bpm: a.min,
+      max_bpm: a.max,
+      samples: a.n,
+    }));
 }
 
 export function registerHeartrateTools(server: McpServer): void {
@@ -60,26 +91,7 @@ export function registerHeartrateTools(server: McpServer): void {
           { start_datetime: toOuraDatetime(start), end_datetime: toOuraDatetime(end) },
           10,
         );
-        const byHour = new Map<string, { sum: number; min: number; max: number; n: number }>();
-        for (const s of samples) {
-          const hour = s.timestamp.slice(0, 13) + ':00Z';
-          const agg = byHour.get(hour) ?? { sum: 0, min: Infinity, max: -Infinity, n: 0 };
-          agg.sum += s.bpm;
-          agg.min = Math.min(agg.min, s.bpm);
-          agg.max = Math.max(agg.max, s.bpm);
-          agg.n += 1;
-          byHour.set(hour, agg);
-        }
-        const hours = [...byHour.entries()]
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([hour, a]) => ({
-            hour,
-            avg_bpm: Math.round(a.sum / a.n),
-            min_bpm: a.min,
-            max_bpm: a.max,
-            samples: a.n,
-          }));
-        return jsonResult({ hours });
+        return jsonResult({ hours: aggregateHourly(samples) });
       }),
   );
 }
