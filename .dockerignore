@@ -1,0 +1,12 @@
+node_modules
+dist
+data
+.env
+.env.*
+!.env.example
+.git
+.github
+docs
+CLAUDE.md
+CLAUDE.local.md
+*.md

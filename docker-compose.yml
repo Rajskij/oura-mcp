@@ -1,0 +1,25 @@
+services:
+  oura-mcp:
+    image: ghcr.io/rajskij/oura-mcp:latest
+    # Or build locally instead of pulling:
+    # build: .
+    env_file: .env
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  # One-time setup: connects an Oura account via browser consent, saves tokens
+  # to ./data, then exits. Run: docker compose --profile setup up get-token
+  get-token:
+    image: ghcr.io/rajskij/oura-mcp:latest
+    profiles: [setup]
+    command: node dist/scripts/get-token.js
+    env_file: .env
+    ports:
+      - '8888:8888'
+    volumes:
+      - ./data:/app/data
+
+# TLS is up to you: put this behind Caddy, Traefik or any reverse proxy.

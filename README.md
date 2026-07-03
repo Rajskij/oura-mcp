@@ -45,7 +45,31 @@ All tools are read-only and marked with `readOnlyHint`, so ChatGPT does not nag 
 
 ## Self-hosting
 
-You need Node 22+, an Oura Ring with an active subscription, and any host with HTTPS (a free-tier VM behind Caddy works fine).
+You need an Oura Ring with an active subscription and any host with HTTPS (a free-tier VM behind Caddy works fine).
+
+### Docker (recommended)
+
+```bash
+# 1. Register an OAuth app at cloud.ouraring.com
+#    Redirect URI: http://localhost:8888/callback
+
+# 2. Configure
+curl -O https://raw.githubusercontent.com/Rajskij/oura-mcp/main/docker-compose.yml
+curl -o .env https://raw.githubusercontent.com/Rajskij/oura-mcp/main/.env.example
+# fill in .env: client id/secret, generate MCP_PATH_SECRET (openssl rand -hex 24)
+
+# 3. Connect an Oura account (one-time browser consent on this machine)
+docker compose --profile setup up get-token
+
+# 4. Run
+docker compose up -d
+```
+
+Keep `PORT=3000` in `.env` (or adjust the compose port mapping to match).
+
+### Node, no Docker
+
+Needs Node 22+.
 
 ```bash
 # 1. Register an OAuth app at cloud.ouraring.com
