@@ -1,0 +1,17 @@
+# deps / build
+node_modules/
+dist/
+
+# секреты — никогда не коммитить
+.env
+.env.*
+!.env.example
+data/
+
+# приватное планирование — не для публичного репо
+CLAUDE.local.md
+docs/ROADMAP.md
+
+# misc
+*.log
+.DS_Store
