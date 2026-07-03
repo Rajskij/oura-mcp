@@ -1,0 +1,26 @@
+name: dependabot-auto-merge
+
+# Minor and patch updates from Dependabot merge themselves once required
+# checks pass. Majors stay manual. Uses a fine-grained PAT (Dependabot
+# secret AUTOMERGE_TOKEN): merges by the default GITHUB_TOKEN would not
+# trigger the deploy pipeline on main.
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]' && github.repository == 'Rajskij/oura-mcp'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dependabot/fetch-metadata@v2
+        id: meta
+
+      - name: Enable auto-merge for minor and patch updates
+        if: steps.meta.outputs.update-type == 'version-update:semver-minor' || steps.meta.outputs.update-type == 'version-update:semver-patch'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
