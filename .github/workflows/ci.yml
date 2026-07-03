@@ -37,6 +37,11 @@ jobs:
       - name: Smoke test against Oura sandbox
         run: npm run smoke
 
+      # Catches Dockerfile breakage before merge; publishing still happens
+      # only from main (see the docker job below).
+      - name: Docker build check
+        run: docker build -t oura-mcp:ci-check .
+
   deploy:
     # Ship to the production box only for commits that landed on main and passed checks.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
