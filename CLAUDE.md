@@ -11,7 +11,7 @@ One Oura account, no auth between the MCP client and this server (a long random 
 ## Stack
 
 - Node.js 22+, TypeScript strict, no `any`
-- MCP: official `@modelcontextprotocol/sdk`, Streamable HTTP transport (not SSE, which is deprecated in the MCP spec)
+- MCP: official `@modelcontextprotocol/sdk`, Streamable HTTP transport (not SSE, which is deprecated in the MCP spec) — wired through `@hono/mcp` (`StreamableHTTPTransport`), which speaks Hono's `Context` directly instead of bridging Node req/res
 - HTTP framework: Hono
 - Phase 1 token storage: `data/tokens.json` (gitignored)
 - Deploy target: Oracle Cloud free-tier VM (x86_64, Ubuntu 24.04, 1 GB RAM + 2 GB swap), Caddy for TLS, systemd
