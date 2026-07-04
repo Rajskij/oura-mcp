@@ -108,6 +108,20 @@ try {
   const wrong = await fetch(`${BASE}/mcp/wrong-path`, { method: 'POST' });
   if (wrong.status !== 404) fail(`wrong path returned ${wrong.status}, expected 404`, child);
 
+  // 5. Stateless mode rejects GET/DELETE with 405 instead of opening an SSE stream.
+  for (const method of ['GET', 'DELETE'] as const) {
+    const res = await fetch(MCP_URL, { method });
+    if (res.status !== 405) fail(`${method} returned ${res.status}, expected 405`, child);
+  }
+
+  // 6. A notification-only POST (no id) is accepted with 202 and no body.
+  const notify = await fetch(MCP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+    body: JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
+  });
+  if (notify.status !== 202) fail(`notification returned ${notify.status}, expected 202`, child);
+
   console.log(`SMOKE OK: ${names.length} tools, sleep days=${payload.days.length}`);
   child.kill();
   process.exit(0);
