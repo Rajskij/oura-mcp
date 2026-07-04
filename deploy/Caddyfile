@@ -1,3 +1,18 @@
+{
+	# The default logger also emits http.log.error, which is where a
+	# reverse_proxy 502 would otherwise log the full request URI — including the
+	# secret /mcp/<path>. Hash the URI so the secret never lands in the journal in
+	# cleartext, while staying a stable token for correlating log lines.
+	log {
+		format filter {
+			wrap console
+			fields {
+				request>uri hash
+			}
+		}
+	}
+}
+
 ${DOMAIN} {
-    reverse_proxy localhost:${PORT}
+	reverse_proxy localhost:${PORT}
 }
