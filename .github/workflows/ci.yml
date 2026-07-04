@@ -51,6 +51,10 @@ jobs:
     env:
       BOX: ubuntu@157.151.235.170
       APP_DIR: /home/ubuntu/oura-mcp
+      # DOMAIN/PORT must match deploy/box.env on the box (bootstrap's source of
+      # truth); they render deploy/Caddyfile and the healthz URL below.
+      DOMAIN: oura-mcp.duckdns.org
+      PORT: "3000"
     steps:
       - uses: actions/checkout@v7
 
@@ -84,15 +88,63 @@ jobs:
             sudo systemctl restart oura-mcp
           "
 
+      # Keep the reverse proxy config in sync with the repo, safely. Rendered here,
+      # validated on the box, and applied only when it differs from what is live.
+      # The live config is backed up first and restored if the reload fails, so
+      # /etc/caddy/Caddyfile never gets ahead of the running Caddy (a bad file on
+      # disk would otherwise load on the next reboot). On a successful reload the
+      # .prev backup is left as the rollback anchor for the Verify health step.
+      - name: Sync Caddy config
+        run: |
+          envsubst '$DOMAIN $PORT' < deploy/Caddyfile > /tmp/Caddyfile.rendered
+          scp -i ~/.ssh/deploy_key /tmp/Caddyfile.rendered "$BOX:/tmp/Caddyfile.rendered"
+          ssh -i ~/.ssh/deploy_key "$BOX" '
+            set -e
+            sudo caddy validate --adapter caddyfile --config /tmp/Caddyfile.rendered
+            if sudo cmp -s /tmp/Caddyfile.rendered /etc/caddy/Caddyfile; then
+              echo "Caddyfile unchanged"
+              sudo rm -f /etc/caddy/Caddyfile.prev
+              rm -f /tmp/Caddyfile.rendered
+              exit 0
+            fi
+            sudo cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.prev
+            sudo cp /tmp/Caddyfile.rendered /etc/caddy/Caddyfile
+            rm -f /tmp/Caddyfile.rendered
+            if ! sudo systemctl reload caddy; then
+              sudo cp /etc/caddy/Caddyfile.prev /etc/caddy/Caddyfile
+              sudo systemctl reload caddy || true
+              sudo rm -f /etc/caddy/Caddyfile.prev
+              echo "caddy reload failed -> restored previous config"
+              exit 1
+            fi
+            echo "Caddyfile changed -> reloaded"
+          '
+
+      # Confirms the app AND the reloaded proxy serve real HTTPS traffic. If health
+      # fails and this deploy changed the Caddyfile (.prev present), roll the proxy
+      # back to the previous config so the site keeps serving; the job still fails.
       - name: Verify health
         run: |
+          ok=""
           for i in $(seq 1 10); do
-            if curl -sf https://oura-mcp.duckdns.org/healthz > /dev/null; then
-              echo "healthz OK"; exit 0
-            fi
+            if curl -sf "https://$DOMAIN/healthz" > /dev/null; then ok=1; break; fi
             sleep 3
           done
-          echo "healthz did not come back after deploy"; exit 1
+          if [ -n "$ok" ]; then
+            ssh -i ~/.ssh/deploy_key "$BOX" 'sudo rm -f /etc/caddy/Caddyfile.prev'
+            echo "healthz OK"
+            exit 0
+          fi
+          echo "healthz did not come back after deploy"
+          ssh -i ~/.ssh/deploy_key "$BOX" '
+            if [ -f /etc/caddy/Caddyfile.prev ]; then
+              sudo cp /etc/caddy/Caddyfile.prev /etc/caddy/Caddyfile
+              sudo systemctl reload caddy || true
+              sudo rm -f /etc/caddy/Caddyfile.prev
+              echo "restored previous Caddyfile after failed health check"
+            fi
+          '
+          exit 1
 
   docker:
     # Publish the image only for commits that landed on main and passed checks.
