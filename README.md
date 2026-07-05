@@ -13,6 +13,15 @@ A remote MCP server that connects Oura Ring data to any MCP client. No UI, no ap
 >
 > **ChatGPT:** Your week was uneven, averaging 65/100. Best night was June 29 (77) with strong deep sleep. The rough one was July 2 (47): little REM, low efficiency, and your bedtime drifted way off schedule. The main pattern to fix is sleep timing.
 
+Things to try once connected:
+
+```text
+Should I train hard today or take it easy?
+Compare my sleep on workdays vs the weekend.
+Did the late coffee I tagged yesterday show up in my night heart rate?
+Какой у меня был пульс сегодня днём?
+```
+
 ## How it works
 
 ```mermaid
@@ -21,7 +30,9 @@ flowchart LR
     B -- "REST, read-only" --> C["Oura API v2"]
 ```
 
-One small Node.js process. The client model picks the right tools, the server returns compact, pre-shaped JSON, the model does the talking.
+One small Node.js process, stateless — a fresh MCP server instance per request. The client model picks the right tools, the server returns compact, pre-shaped JSON, the model does the talking.
+
+**When you don't need this:** if you want dashboards and charts, the Oura app already does that; if you want raw data for scripts, call the [Oura API](https://cloud.ouraring.com/v2/docs) directly. This server exists for one thing: making your ring data conversational in the chat client you already use.
 
 ## Tools
 
@@ -48,9 +59,18 @@ All tools are read-only and marked with `readOnlyHint`, so ChatGPT does not nag 
 - **Actionable errors.** A too-wide heart rate query returns "ask for 3 days or less, or use oura_get_readiness for trends", not a 400.
 - **Sane defaults.** Every tool works with zero arguments (last 7 days).
 
-## Self-hosting
+## Requirements
 
-You need an Oura Ring with an active subscription and any host with HTTPS (a free-tier VM behind Caddy works fine).
+- An Oura Ring with an active Oura subscription (the API returns 403 without one)
+- Any host with public HTTPS — a free-tier VM behind Caddy works fine. Avoid free tiers that sleep between requests: ChatGPT times out on cold starts
+- Node 22+ or Docker
+- 5 minutes to register your own Oura OAuth app (below)
+
+### Why do I need my own Oura app?
+
+Oura deprecated personal access tokens in December 2025, so an OAuth app is the only supported way to access your data — this is Oura's rule, not this project's. Registering one is free, instant, and needs no review for personal use. It is also the best part of the design: your tokens are issued to *your* app and live on *your* server, so your health data never depends on anyone else's infrastructure — including mine.
+
+## Self-hosting
 
 ### Docker (recommended)
 
@@ -72,7 +92,8 @@ docker compose up -d
 
 Keep `PORT=3000` in `.env` (or adjust the compose port mapping to match).
 
-### Node, no Docker
+<details>
+<summary><b>Node, no Docker</b></summary>
 
 Needs Node 22+.
 
@@ -91,22 +112,84 @@ npm run get-token
 npm run dev
 ```
 
-Then add the connector in ChatGPT (Settings → Apps → Developer mode) or Claude (Settings → Connectors) pointing at `https://your-host/mcp/<MCP_PATH_SECRET>`.
+</details>
 
 Want to hack on it without a ring? `OURA_SANDBOX=1 npm run dev` serves Oura's sandbox data, no account needed.
 
-## Privacy
+## Connect your chat client
 
-- Tokens never leave your server; the MCP client only sees tool results.
-- Read-only OAuth scopes. The Oura API has no write endpoints, and neither does this server.
+Your MCP endpoint is `https://your-host/mcp/<MCP_PATH_SECRET>`.
+
+<details>
+<summary><b>ChatGPT</b> (Plus and above, desktop web)</summary>
+
+1. Settings → Apps → Advanced settings → enable **Developer mode**
+2. Settings → Apps → **Create**: name it, paste your MCP endpoint URL, auth = **No auth**
+3. In a conversation, open the **+** menu → Developer mode → enable the app
+
+Set up on desktop web; the app then works in mobile conversations too.
+
+</details>
+
+<details>
+<summary><b>Claude</b> (web and desktop)</summary>
+
+1. Settings → **Connectors** → **Add custom connector**
+2. Paste your MCP endpoint URL → Add
+
+Claude connects from Anthropic's cloud, so the server must be publicly reachable (no localhost).
+
+</details>
+
+<details>
+<summary><b>Other clients (Cursor, local-only clients)</b></summary>
+
+Clients that only speak stdio can use the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridge:
+
+```json
+{
+  "mcpServers": {
+    "oura": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://your-host/mcp/<MCP_PATH_SECRET>"]
+    }
+  }
+}
+```
+
+</details>
+
+## Configuration
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `OURA_CLIENT_ID` | yes | Your Oura app's client id |
+| `OURA_CLIENT_SECRET` | yes | Your Oura app's client secret |
+| `MCP_PATH_SECRET` | yes | Long random URL path segment (`openssl rand -hex 24`) — the access control for the endpoint |
+| `PORT` | no | HTTP port, default 3000 |
+| `OURA_SANDBOX` | no | `1` = serve Oura's fake sandbox data, no account needed |
+
+## Troubleshooting
+
+- **403 from every tool** — no active Oura subscription on the connected account. The API requires one.
+- **401 / "token expired, needs a reconnect"** — the stored refresh token was lost or invalidated (Oura rotates it on every refresh; never run two copies of the server against the same `data/tokens.json`). Re-run `get-token`.
+- **404 when connecting** — the path secret in the URL doesn't match `MCP_PATH_SECRET`. Copy the full endpoint URL again.
+- **ChatGPT: "Error creating connector" / timeouts** — your host is asleep. ChatGPT aborts on cold starts (~60 s budget); use an always-on host.
+- **`resilience` / `vo2_max` come back empty** — Oura computes these after ~2 weeks of wear / a fitness test; the tools work, the account has no data yet.
+
+## Security & privacy
+
+- OAuth tokens never leave your server; the MCP client only sees tool results.
+- Read-only scopes; the Oura API has no write endpoints for health data, and neither does this server.
 - Your email is never returned by any tool.
 - The optional usage log records tool names and timings only, never health values.
+- **Prompt injection:** treat health conversations as sensitive. If a chat mixes this connector with untrusted content (web browsing, pasted documents), a malicious page can try to steer the model into calling tools and echoing your data into a reply it controls. The blast radius here is bounded — read-only tools, your own data — but the cleanest habit is simple: ask health questions in chats that aren't also browsing the web.
 
-## Status
+## Status & roadmap
 
-Phase 1: single-user, self-hosted. Works today, runs my household's ring.
+Self-hosted and single-user by design: your data flows directly between your server and Oura, which is also what [Oura's API terms](https://cloud.ouraring.com/legal/api-agreement) expect from personal integrations. It runs my household's ring today.
 
-Phase 2 (if real demand shows up): hosted multi-tenant with one-click Oura OAuth, so non-technical people can connect without deploying anything. Open an issue if you want this to exist.
+Coming next: a one-click Claude Desktop extension (`.mcpb`) and a free-tier Cloudflare Workers deploy button — same server, no VM needed. Open an issue if you want one of these sooner.
 
 ## License
 
