@@ -30,7 +30,7 @@ flowchart LR
     B -- "REST, read-only" --> C["Oura API v2"]
 ```
 
-One small Node.js process, stateless — a fresh MCP server instance per request. The client model picks the right tools, the server returns compact, pre-shaped JSON, the model does the talking.
+One small Node.js process, stateless — a fresh MCP server instance per request. The client model picks the right tools, the server returns compact, pre-shaped JSON, the model does the talking. Curious how it's put together and why? See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 **When you don't need this:** if you want dashboards and charts, the Oura app already does that; if you want raw data for scripts, call the [Oura API](https://cloud.ouraring.com/v2/docs) directly. This server exists for one thing: making your ring data conversational in the chat client you already use.
 

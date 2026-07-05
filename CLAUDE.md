@@ -2,11 +2,13 @@
 
 Remote MCP server that exposes Oura Ring data (sleep, readiness, activity, stress, heart rate) to MCP clients like ChatGPT and Claude. The client model does all interpretation and translation; this server only returns compact, well-shaped data.
 
-If `CLAUDE.local.md` or `docs/ROADMAP.md` exist in your checkout (both are gitignored), read them first. They hold the current plan and private context.
+If `CLAUDE.local.md` or `docs/ROADMAP.md` exist in your checkout (both are gitignored), read them first. They hold the current plan and private context. `docs/ARCHITECTURE.md` (public) is the code map: where things live and which invariants to keep.
 
-## Current phase: 1 (single user)
+## Current phase: 2 — showcase (self-host distribution)
 
-One Oura account, no auth between the MCP client and this server (a long random URL path instead), deployed on an Oracle ARM VM. Do not build phase 2 features (multi-tenant, OAuth server, database, Next.js, webhooks) unless the phase is explicitly switched in the roadmap.
+The server itself stays single-user: one Oura account, no auth between the MCP client and this server (a long random URL path instead), deployed on an Oracle free-tier VM (x86_64). Phase 2 is polish and distribution of that same server: README and architecture docs, releases, MCP catalog listings, a Claude Desktop `.mcpb` bundle, a Cloudflare Workers entry.
+
+Never build, regardless of phase — barred by Oura's API terms, not deferred: multi-tenant hosting, an OAuth server between MCP clients and this server, databases holding other people's tokens, anything that routes third-party user data through infrastructure we run. `docs/ARCHITECTURE.md` ("Self-host distribution") has the short version of why.
 
 ## Stack
 
