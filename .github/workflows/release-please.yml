@@ -1,0 +1,59 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          # Fine-grained PAT (contents + pull-requests RW). The default
+          # GITHUB_TOKEN cannot be used here: PRs it creates never trigger the
+          # required `checks` workflow, so the Release PR would sit unmergeable
+          # under the protected-main ruleset.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+
+  # The ci workflow already publishes :latest and :<sha> on every merge to
+  # main. When a release is cut, alias the release commit's image with the
+  # semver tag so `docker pull ghcr.io/rajskij/oura-mcp:v0.2.0` works.
+  tag-docker-image:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - uses: docker/login-action@v4.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The sha image is built by the ci `docker` job running in parallel on
+      # the same push; wait for it rather than building a second time.
+      - name: Tag the release image
+        run: |
+          IMG=ghcr.io/rajskij/oura-mcp
+          TAG=${{ needs.release-please.outputs.tag_name }}
+          for i in $(seq 1 20); do
+            if docker buildx imagetools inspect "$IMG:${{ github.sha }}" > /dev/null 2>&1; then
+              docker buildx imagetools create "$IMG:${{ github.sha }}" --tag "$IMG:$TAG"
+              echo "tagged $IMG:$TAG"
+              exit 0
+            fi
+            echo "sha image not published yet, waiting ($i/20)"
+            sleep 30
+          done
+          echo "sha image never appeared"
+          exit 1
