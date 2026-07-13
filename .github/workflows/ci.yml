@@ -40,6 +40,9 @@ jobs:
       - name: Smoke test stdio entry (demo fallback)
         run: npm run smoke:stdio
 
+      - name: Validate the Claude Desktop extension manifest
+        run: npx --yes @anthropic-ai/mcpb@2.1.2 validate manifest.json
+
       # Catches Dockerfile breakage before merge; publishing still happens
       # only from main (see the docker job below).
       - name: Docker build check

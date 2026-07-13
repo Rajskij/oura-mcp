@@ -24,6 +24,46 @@ jobs:
           # under the protected-main ruleset.
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
+  # Releases are created as DRAFTS (release-please config): with release
+  # immutability enabled, assets cannot be attached after publishing, so the
+  # bundle must land on the draft. This job builds the Claude Desktop
+  # extension, uploads it, and only then publishes the release.
+  build-mcpb:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.release-please.outputs.tag_name }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the bundle
+        run: |
+          npm ci
+          npm run build
+          npm ci --omit=dev
+          mkdir bundle
+          cp manifest.json bundle/
+          cp assets/logo.png bundle/icon.png
+          cp -R dist bundle/dist
+          cp -R node_modules bundle/node_modules
+          npx --yes @anthropic-ai/mcpb@2.1.2 validate bundle/manifest.json
+          npx --yes @anthropic-ai/mcpb@2.1.2 pack bundle oura-mcp.mcpb
+
+      - name: Attach to the draft release and publish
+        run: |
+          gh release upload "$TAG" oura-mcp.mcpb --clobber
+          gh release edit "$TAG" --draft=false --latest
+          echo "published $TAG with oura-mcp.mcpb"
+
   # The ci workflow already publishes :latest and :<sha> on every merge to
   # main. When a release is cut, alias the release commit's image with the
   # semver tag so `docker pull ghcr.io/rajskij/oura-mcp:v0.2.0` works.

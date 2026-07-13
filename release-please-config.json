@@ -13,7 +13,11 @@
     { "type": "docs", "section": "Documentation" },
     { "type": "ci", "section": "CI/CD" }
   ],
-  "extra-files": ["src/server.ts"],
+  "draft": true,
+  "extra-files": [
+    "src/server.ts",
+    { "type": "json", "path": "manifest.json", "jsonpath": "$.version" }
+  ],
   "packages": {
     ".": {}
   }

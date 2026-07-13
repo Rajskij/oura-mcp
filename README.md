@@ -72,7 +72,11 @@ Oura deprecated personal access tokens in December 2025, so an OAuth app is the 
 
 ## Run locally (Claude Desktop) — easiest start
 
-No server to deploy: Claude Desktop starts oura-mcp itself as a local process. Try it in **demo mode** first — zero configuration, no Oura account, fake sandbox data:
+No server to deploy: Claude Desktop starts oura-mcp itself as a local process.
+
+**The two-click install:** download `oura-mcp.mcpb` from the [latest release](https://github.com/Rajskij/oura-mcp/releases/latest) and double-click it — Claude Desktop opens the install dialog. Leave the credential fields empty to try the **demo mode** (fake sandbox data, no Oura account needed), or paste your own Oura app credentials (stored in the OS keychain): on the first question Claude opens your browser for the Oura consent, approve it and ask again. Tokens live in `~/.oura-mcp/`, chmod 600.
+
+Prefer a config-file setup, or using a different stdio client? The docker route works everywhere:
 
 ```json
 {
@@ -110,8 +114,6 @@ Ask Claude "how did I sleep this week?" — you'll get answers from Oura's sandb
   }
 }
 ```
-
-A one-click Claude Desktop extension (`.mcpb`) that replaces all of this with an install dialog is on the roadmap.
 
 </details>
 
