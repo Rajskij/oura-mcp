@@ -52,7 +52,7 @@ jobs:
           npm ci --omit=dev
           mkdir bundle
           cp manifest.json bundle/
-          cp assets/logo.png bundle/icon.png
+          cp assets/icon.png bundle/icon.png
           cp -R dist bundle/dist
           cp -R node_modules bundle/node_modules
           npx --yes @anthropic-ai/mcpb@2.1.2 validate bundle/manifest.json
