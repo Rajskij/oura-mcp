@@ -3,6 +3,7 @@
   "release-type": "node",
   "include-v-in-tag": true,
   "include-component-in-tag": false,
+  "bootstrap-sha": "cd18f81f1eb8440bce3233c691bad70717f95324",
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
   "changelog-sections": [
