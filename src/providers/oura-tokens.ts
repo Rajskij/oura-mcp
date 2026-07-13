@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
 
 /**
  * Token storage and OAuth token exchange for Oura.
@@ -8,7 +9,26 @@ import { dirname } from 'node:path';
  */
 
 const OURA_TOKEN_URL = 'https://api.ouraring.com/oauth/token';
-const TOKENS_FILE = 'data/tokens.json';
+
+/**
+ * Where the token file lives, in priority order:
+ * 1. OURA_TOKENS_FILE env — explicit override;
+ * 2. data/tokens.json — when a data/ directory exists next to the process
+ *    (the VM and the docker volume both work this way);
+ * 3. ~/.oura-mcp/tokens.json — local runs with no fixed working directory
+ *    (Claude Desktop starts the stdio entry from an arbitrary cwd).
+ */
+export function resolveTokensFile(
+  env: NodeJS.ProcessEnv,
+  dataDirExists: boolean,
+  home: string,
+): string {
+  if (env.OURA_TOKENS_FILE) return env.OURA_TOKENS_FILE;
+  if (dataDirExists) return 'data/tokens.json';
+  return join(home, '.oura-mcp', 'tokens.json');
+}
+
+export const TOKENS_FILE = resolveTokensFile(process.env, existsSync('data'), homedir());
 
 export interface OuraTokens {
   access_token: string;
@@ -19,7 +39,9 @@ export interface OuraTokens {
 
 export function saveTokens(tokens: OuraTokens): void {
   mkdirSync(dirname(TOKENS_FILE), { recursive: true });
-  writeFileSync(TOKENS_FILE, JSON.stringify(tokens, null, 2));
+  writeFileSync(TOKENS_FILE, JSON.stringify(tokens, null, 2), { mode: 0o600 });
+  // writeFileSync applies mode only on creation; enforce it for pre-existing files.
+  chmodSync(TOKENS_FILE, 0o600);
 }
 
 export function loadTokens(): OuraTokens {

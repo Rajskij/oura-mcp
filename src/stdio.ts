@@ -18,6 +18,10 @@ if (!process.env.OURA_CLIENT_ID || !process.env.OURA_CLIENT_SECRET) {
     '[oura-mcp] No Oura credentials found — running in sandbox demo mode (fake data). ' +
       'Set OURA_CLIENT_ID and OURA_CLIENT_SECRET to use a real account.',
   );
+} else if (!process.env.OURA_SANDBOX) {
+  // A human is on the other side of a stdio client, so if no account is
+  // connected yet the provider may open a browser for the Oura consent.
+  process.env.OURA_INTERACTIVE_AUTH = '1';
 }
 
 // Dynamic import so the sandbox decision above is visible to the Oura provider,
