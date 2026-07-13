@@ -61,16 +61,63 @@ All tools are read-only and marked with `readOnlyHint`, so ChatGPT does not nag 
 
 ## Requirements
 
-- An Oura Ring with an active Oura subscription (the API returns 403 without one)
-- Any host with public HTTPS — a free-tier VM behind Caddy works fine. Avoid free tiers that sleep between requests: ChatGPT times out on cold starts
+- An Oura Ring with an active Oura subscription (the API returns 403 without one) — or nothing at all for the sandbox demo mode
 - Node 22+ or Docker
 - 5 minutes to register your own Oura OAuth app (below)
+- Only for the remote path (ChatGPT, claude.ai web): any host with public HTTPS — a free-tier VM behind Caddy works fine. Avoid free tiers that sleep between requests: ChatGPT times out on cold starts
 
 ### Why do I need my own Oura app?
 
 Oura deprecated personal access tokens in December 2025, so an OAuth app is the only supported way to access your data — this is Oura's rule, not this project's. Registering one is free, instant, and needs no review for personal use. It is also the best part of the design: your tokens are issued to *your* app and live on *your* server, so your health data never depends on anyone else's infrastructure — including mine.
 
-## Self-hosting
+## Run locally (Claude Desktop) — easiest start
+
+No server to deploy: Claude Desktop starts oura-mcp itself as a local process. Try it in **demo mode** first — zero configuration, no Oura account, fake sandbox data:
+
+```json
+{
+  "mcpServers": {
+    "oura": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "ghcr.io/rajskij/oura-mcp:latest", "node", "dist/src/stdio.js"]
+    }
+  }
+}
+```
+
+Ask Claude "how did I sleep this week?" — you'll get answers from Oura's sandbox data, which is exactly how the real thing behaves.
+
+<details>
+<summary><b>Switch to your real account</b></summary>
+
+1. Register an OAuth app at cloud.ouraring.com (redirect URI `http://localhost:8888/callback`) and put the credentials in an `.env` file next to a copy of [docker-compose.yml](docker-compose.yml)
+2. One-time browser consent, saves tokens to `./data`: `docker compose --profile setup up get-token`
+3. Point the same config at your credentials and tokens:
+
+```json
+{
+  "mcpServers": {
+    "oura": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "--env-file", "/absolute/path/to/.env",
+        "-v", "/absolute/path/to/data:/app/data",
+        "ghcr.io/rajskij/oura-mcp:latest",
+        "node", "dist/src/stdio.js"
+      ]
+    }
+  }
+}
+```
+
+A one-click Claude Desktop extension (`.mcpb`) that replaces all of this with an install dialog is on the roadmap.
+
+</details>
+
+Running from source instead of Docker: `npm install && npm run build`, then use `"command": "node", "args": ["/path/to/oura-mcp/dist/src/stdio.js"]` (with `cwd` at the repo so `data/tokens.json` resolves).
+
+## Self-hosting (remote: ChatGPT, claude.ai web)
 
 ### Docker (recommended)
 

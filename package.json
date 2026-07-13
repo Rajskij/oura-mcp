@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
+  "bin": {
+    "oura-mcp": "dist/src/stdio.js"
+  },
   "engines": {
     "node": ">=22"
   },
@@ -15,6 +18,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "smoke": "tsx scripts/smoke.ts",
+    "smoke:stdio": "tsx scripts/smoke-stdio.ts",
     "get-token": "tsx scripts/get-token.ts"
   },
   "dependencies": {
