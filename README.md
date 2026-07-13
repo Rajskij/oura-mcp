@@ -13,6 +13,8 @@ A remote MCP server that connects Oura Ring data to any MCP client. No UI, no ap
 >
 > **ChatGPT:** Your week was uneven, averaging 65/100. Best night was June 29 (77) with strong deep sleep. The rough one was July 2 (47): little REM, low efficiency, and your bedtime drifted way off schedule. The main pattern to fix is sleep timing.
 
+**Get started in two clicks:** download [`oura-mcp.mcpb` from the latest release](https://github.com/Rajskij/oura-mcp/releases/latest) and double-click it — Claude Desktop installs the extension, and **demo mode works instantly with zero setup** (fake sample data, no Oura account needed). Connecting your own ring takes ~5 minutes: [Run locally](#run-locally-claude-desktop--easiest-start).
+
 Things to try once connected:
 
 ```text
@@ -74,7 +76,13 @@ Oura deprecated personal access tokens in December 2025, so an OAuth app is the 
 
 No server to deploy: Claude Desktop starts oura-mcp itself as a local process.
 
-**The two-click install:** download `oura-mcp.mcpb` from the [latest release](https://github.com/Rajskij/oura-mcp/releases/latest) and double-click it — Claude Desktop opens the install dialog. Leave the credential fields empty to try the **demo mode** (fake sandbox data, no Oura account needed), or paste your own Oura app credentials (stored in the OS keychain): on the first question Claude opens your browser for the Oura consent, approve it and ask again. Tokens live in `~/.oura-mcp/`, chmod 600.
+**Install (two clicks):** download `oura-mcp.mcpb` from the [latest release](https://github.com/Rajskij/oura-mcp/releases/latest), double-click it, press Install. Done — **demo mode** works immediately (fake sandbox data, no Oura account), so you can try every tool before any setup. Claude will remind you the numbers are samples.
+
+**Connect your real ring (~5 minutes):**
+
+1. Create your own Oura app (free, instant, no review) at [cloud.ouraring.com/oauth/applications](https://cloud.ouraring.com/oauth/applications) — set the redirect URI to exactly `http://localhost:8888/callback`
+2. In Claude Desktop: Settings → Extensions → oura-mcp → **Configure** → paste the app's Client ID and Client Secret (the secret is stored in your OS keychain)
+3. Ask Claude a health question — your browser opens the Oura consent page. Approve, ask again, and you're looking at your own data. Tokens stay on your machine (`~/.oura-mcp/`, chmod 600).
 
 Prefer a config-file setup, or using a different stdio client? The docker route works everywhere:
 
