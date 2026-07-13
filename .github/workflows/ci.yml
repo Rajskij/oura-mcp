@@ -37,6 +37,9 @@ jobs:
       - name: Smoke test against Oura sandbox
         run: npm run smoke
 
+      - name: Smoke test stdio entry (demo fallback)
+        run: npm run smoke:stdio
+
       # Catches Dockerfile breakage before merge; publishing still happens
       # only from main (see the docker job below).
       - name: Docker build check
