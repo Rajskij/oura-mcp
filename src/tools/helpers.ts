@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { OuraApiError } from '../providers/oura.js';
+import { OuraApiError, SANDBOX } from '../providers/oura.js';
 import { logUsage } from './logger.js';
 
 /** Shared plumbing for all tools: date defaults, unit conversion, result shaping. */
@@ -53,7 +53,19 @@ export type ToolResult = {
 };
 
 export function jsonResult(data: unknown): ToolResult {
-  return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+  // In sandbox demo mode the model must know the numbers are fake, or it will
+  // present sample data as the user's own (and suggest syncing a ring that
+  // does not exist). Top-level shape is preserved: the note is one extra key.
+  const payload =
+    SANDBOX && data !== null && typeof data === 'object' && !Array.isArray(data)
+      ? {
+          sandbox_note:
+            'DEMO MODE: fake sample data from the public Oura sandbox, no account is connected. ' +
+            'Make sure the user knows these are not their real numbers.',
+          ...(data as Record<string, unknown>),
+        }
+      : data;
+  return { content: [{ type: 'text' as const, text: JSON.stringify(payload) }] };
 }
 
 export function errorResult(message: string): ToolResult {

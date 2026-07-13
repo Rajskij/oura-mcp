@@ -10,7 +10,7 @@ import { exchangeToken, loadTokens } from './oura-tokens.js';
  * token. No real account or subscription needed — used for local smoke tests.
  * Note: the sandbox has no personal_info endpoint; tools handle that gracefully.
  */
-const SANDBOX = process.env.OURA_SANDBOX === '1' || process.env.OURA_SANDBOX === 'true';
+export const SANDBOX = process.env.OURA_SANDBOX === '1' || process.env.OURA_SANDBOX === 'true';
 
 const OURA_API_BASE = SANDBOX
   ? 'https://api.ouraring.com/v2/sandbox'
