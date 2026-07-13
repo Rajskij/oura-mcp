@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.1](https://github.com/Rajskij/oura-mcp/compare/v0.2.0...v0.2.1) (2026-07-13)
+
+
+### Features
+
+* local stdio entry with sandbox demo fallback ([d83a2c8](https://github.com/Rajskij/oura-mcp/commit/d83a2c831b5f880944e4d3812170f9dce194cf53))
+* local stdio entry with sandbox demo fallback ([224cbcc](https://github.com/Rajskij/oura-mcp/commit/224cbcc5dacfc574b14c6f28f27dab20d5cd5f0b))
+
+
+### Bug Fixes
+
+* **ci:** anchor release-please after the v0.2.0 release ([a95367b](https://github.com/Rajskij/oura-mcp/commit/a95367b2e934e84a793182d06367c62ece4f37cc))
+* **ci:** anchor release-please after the v0.2.0 release ([3eab327](https://github.com/Rajskij/oura-mcp/commit/3eab327c1b8d5b2ad8f1823a8c80e59b786834a1))
+
 ## 0.2.0 (2026-07-06)
 
 

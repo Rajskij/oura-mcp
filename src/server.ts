@@ -7,7 +7,7 @@ import { registerAllTools } from './tools/index.js';
  */
 export function buildServer(): McpServer {
   // Version is kept in sync with releases by release-please (extra-files).
-  const server = new McpServer({ name: 'oura-mcp', version: '0.2.0' }); // x-release-please-version
+  const server = new McpServer({ name: 'oura-mcp', version: '0.2.1' }); // x-release-please-version
   registerAllTools(server);
   return server;
 }
