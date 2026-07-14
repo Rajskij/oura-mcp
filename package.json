@@ -55,7 +55,7 @@
         "description": "Client ID of your own free Oura app from [developer.ouraring.com/applications](https://developer.ouraring.com/applications). Leave empty for demo mode."
       },
       "OURA_CLIENT_SECRET": {
-        "description": "Client secret of the same Oura app. After deploying, set its redirect URI to `https://<your-worker-url>/oauth/callback`."
+        "description": "Client secret of the same [Oura app](https://developer.ouraring.com/applications). After deploying, add its redirect URI in the Oura app settings: your worker URL followed by `/oauth/callback`. Leave empty for demo mode."
       }
     }
   }
