@@ -3,8 +3,10 @@
 # (the Deploy to Cloudflare flow prompts for these during setup).
 
 # Long random URL path segment — the access control for the MCP endpoint.
-# Generate with: openssl rand -hex 24
-MCP_PATH_SECRET=
+# The default below is fine for the fake-data demo, but the worker REFUSES to
+# serve a real Oura account under it. Replace it (openssl rand -hex 24) before
+# connecting your account.
+MCP_PATH_SECRET=change-me-to-a-long-random-string
 
 # Your Oura app credentials from https://developer.ouraring.com/applications.
 # Register the redirect URI: https://<your-worker-host>/oauth/callback

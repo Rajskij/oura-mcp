@@ -49,7 +49,7 @@
     ],
     "bindings": {
       "MCP_PATH_SECRET": {
-        "description": "A long random string that guards your endpoint (it becomes part of the URL). Generate one with `openssl rand -hex 24`. **Leave every field empty to deploy a demo with fake sample data.**"
+        "description": "The secret path that guards your endpoint. **The default is only safe for the fake-data demo** — replace it with a long random string (`openssl rand -hex 24`, or any [random generator](https://www.random.org/strings/)) before connecting a real Oura account. Leave the Oura fields below empty to just try the demo."
       },
       "OURA_CLIENT_ID": {
         "description": "Client ID of your own free Oura app from [developer.ouraring.com/applications](https://developer.ouraring.com/applications). Leave empty for demo mode."

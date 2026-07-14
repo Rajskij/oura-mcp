@@ -69,9 +69,30 @@ function tokensStub(env: Env) {
   return env.OURA_TOKENS.get(env.OURA_TOKENS.idFromName('singleton'));
 }
 
+/**
+ * The value shipped as the deploy-dialog default (see .dev.vars.example). It
+ * lets the demo work with zero setup, but is public — so it must never guard a
+ * real account.
+ */
+const INSECURE_DEFAULT_SECRET = 'change-me-to-a-long-random-string';
+
+function realCredentials(env: Env): boolean {
+  const sandbox = env.OURA_SANDBOX === '1' || env.OURA_SANDBOX === 'true';
+  return !sandbox && !!env.OURA_CLIENT_ID && !!env.OURA_CLIENT_SECRET;
+}
+
 function requireSecret(env: Env): string {
   const secret = env.MCP_PATH_SECRET;
   if (!secret) throw new HTTPException(500, { message: 'MCP_PATH_SECRET is not configured' });
+  // Fine for the fake-data demo; refuse to expose a real account under a secret
+  // that ships in the public repo.
+  if (secret === INSECURE_DEFAULT_SECRET && realCredentials(env)) {
+    throw new HTTPException(403, {
+      message:
+        'MCP_PATH_SECRET is still the shipped default. Set a long random value ' +
+        '(openssl rand -hex 24) in the worker settings before connecting a real Oura account.',
+    });
+  }
   return secret;
 }
 

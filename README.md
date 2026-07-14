@@ -133,12 +133,17 @@ ChatGPT and claude.ai on the web can't run a local process; they need a public H
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Rajskij/oura-mcp)
 
-The button clones this repo into **your** Cloudflare account and deploys it — you get a `https://oura-mcp.<you>.workers.dev` address. During setup, set these secrets (or leave them unset for demo mode with fake data):
+The button clones this repo into **your** Cloudflare account and deploys it — you get a `https://oura-mcp.<you>.workers.dev` address.
 
-- `MCP_PATH_SECRET` — a long random string (`openssl rand -hex 24`); your endpoint is `https://<host>/mcp/<MCP_PATH_SECRET>`
-- `OURA_CLIENT_ID`, `OURA_CLIENT_SECRET` — from [your Oura app](https://developer.ouraring.com/applications), whose redirect URI must be `https://<host>/oauth/callback`
+**Just trying it?** Deploy with the fields as-is — it runs in demo mode (fake sample data, no Oura account). Your endpoint is `https://<host>/mcp/<MCP_PATH_SECRET>`; add it as a connector in ChatGPT (Settings → Apps → Developer mode) or Claude.
 
-To connect your account, open `https://<host>/oauth/start?key=<MCP_PATH_SECRET>` once in a browser and approve. Then add `https://<host>/mcp/<MCP_PATH_SECRET>` as a connector in ChatGPT (Settings → Apps → Developer mode) or Claude. Tokens are stored server-side in a Durable Object, never exposed to the client. Free tier (100k requests/day, always-on, no cold starts) is far beyond personal use.
+**Connecting your real ring:**
+
+1. Replace `MCP_PATH_SECRET` with a long random string (`openssl rand -hex 24`) — the worker refuses to serve a real account under the shipped default.
+2. Set `OURA_CLIENT_ID` / `OURA_CLIENT_SECRET` from [your Oura app](https://developer.ouraring.com/applications), whose redirect URI must be `https://<host>/oauth/callback`.
+3. Open `https://<host>/oauth/start?key=<MCP_PATH_SECRET>` once in a browser and approve.
+
+Tokens are stored server-side in a Durable Object, never exposed to the client. Free tier (100k requests/day, always-on, no cold starts) is far beyond personal use.
 
 ## Self-hosting (your own VM)
 
