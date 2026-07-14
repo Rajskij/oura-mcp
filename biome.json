@@ -1,7 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
   "files": {
-    "includes": ["src/**", "scripts/**", "*.json", "!.release-please-manifest.json"]
+    "includes": [
+      "src/**",
+      "scripts/**",
+      "*.json",
+      "!.release-please-manifest.json",
+      "!manifest.json"
+    ]
   },
   "formatter": {
     "enabled": true,
