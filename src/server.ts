@@ -22,7 +22,7 @@ const REAL_INSTRUCTIONS = `Tools read the connected Oura account; everything is 
 export function buildServer(): McpServer {
   const server = new McpServer(
     // Version is kept in sync with releases by release-please (extra-files).
-    { name: 'oura-mcp', version: '0.2.2' }, // x-release-please-version
+    { name: 'oura-mcp', version: '0.2.3' }, // x-release-please-version
     { instructions: SANDBOX ? DEMO_INSTRUCTIONS : REAL_INSTRUCTIONS },
   );
   registerAllTools(server);

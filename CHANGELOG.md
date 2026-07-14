@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.3](https://github.com/Rajskij/oura-mcp/compare/v0.2.2...v0.2.3) (2026-07-14)
+
+
+### Features
+
+* Claude Desktop extension (.mcpb) built and attached on release ([#41](https://github.com/Rajskij/oura-mcp/issues/41)) ([7ff7d61](https://github.com/Rajskij/oura-mcp/commit/7ff7d61dd7889a66850ea489d0c853a5d93619a3))
+* local stdio entry with sandbox demo fallback ([d83a2c8](https://github.com/Rajskij/oura-mcp/commit/d83a2c831b5f880944e4d3812170f9dce194cf53))
+* local stdio entry with sandbox demo fallback ([224cbcc](https://github.com/Rajskij/oura-mcp/commit/224cbcc5dacfc574b14c6f28f27dab20d5cd5f0b))
+* portable token storage and in-client Oura consent ([#39](https://github.com/Rajskij/oura-mcp/issues/39)) ([51e5a84](https://github.com/Rajskij/oura-mcp/commit/51e5a84f601d93f3e248d532e9992ae79184b65f))
+
+
+### Bug Fixes
+
+* **ci:** anchor release-please after the v0.2.0 release ([a95367b](https://github.com/Rajskij/oura-mcp/commit/a95367b2e934e84a793182d06367c62ece4f37cc))
+* **ci:** anchor release-please after the v0.2.0 release ([3eab327](https://github.com/Rajskij/oura-mcp/commit/3eab327c1b8d5b2ad8f1823a8c80e59b786834a1))
+
+
+### CI/CD
+
+* exclude manifest.json from biome checks ([#42](https://github.com/Rajskij/oura-mcp/issues/42)) ([cb8b34c](https://github.com/Rajskij/oura-mcp/commit/cb8b34c293b4b0ef31c84e3cfa6741eed310ac72))
+
 ## [0.2.2](https://github.com/Rajskij/oura-mcp/compare/v0.2.1...v0.2.2) (2026-07-14)
 
 
