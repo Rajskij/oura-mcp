@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isSandbox, OuraApiError } from '../providers/oura.js';
+import { connectSteps } from '../setup-guide.js';
 import { logUsage } from './logger.js';
 
 /** Shared plumbing for all tools: date defaults, unit conversion, result shaping. */
@@ -56,12 +57,6 @@ const DEMO_NOTE =
   'DEMO MODE: fake sample data from the public Oura sandbox, no account is connected. ' +
   'Make sure the user knows these are not their real numbers.';
 
-const CONNECT_STEPS =
-  ' If they want their real data, give them exactly these steps (do not search the web): ' +
-  '1) create a free Oura app at https://developer.ouraring.com/applications with redirect URI exactly http://localhost:8888/callback; ' +
-  '2) Claude Desktop -> Settings -> Extensions -> oura-mcp -> Configure: paste the Client ID and Client Secret; ' +
-  '3) ask a health question again and approve the Oura consent page that opens in the browser.';
-
 let connectStepsSent = false;
 
 export function jsonResult(data: unknown): ToolResult {
@@ -74,7 +69,9 @@ export function jsonResult(data: unknown): ToolResult {
   const payload =
     isSandbox() && data !== null && typeof data === 'object' && !Array.isArray(data)
       ? {
-          sandbox_note: connectStepsSent ? DEMO_NOTE : DEMO_NOTE + CONNECT_STEPS,
+          sandbox_note: connectStepsSent
+            ? DEMO_NOTE
+            : `${DEMO_NOTE} If they want their real data, give them exactly these steps (do not search the web): ${connectSteps()}`,
           ...(data as Record<string, unknown>),
         }
       : data;

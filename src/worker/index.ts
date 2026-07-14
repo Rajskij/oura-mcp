@@ -6,6 +6,11 @@ import { EXPIRY_MARGIN_MS, OuraApiError, setAccessTokenProvider } from '../provi
 import { buildAuthorizeUrl } from '../providers/oura-oauth.js';
 import { type OuraTokens, requestToken } from '../providers/oura-tokens.js';
 import { buildServer } from '../server.js';
+import { setSetupKind } from '../setup-guide.js';
+
+// Deployed as a Cloudflare Worker, so "connect your account" means worker
+// settings + the /oauth/start URL, not extension config or a local get-token.
+setSetupKind('worker');
 
 /**
  * Cloudflare Workers entry: the same MCP server on the edge, for clients that

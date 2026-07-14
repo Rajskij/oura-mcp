@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { setSetupKind } from './setup-guide.js';
+
+// This entry ships as the Claude Desktop (.mcpb) extension, so "connect your
+// account" means the extension's Configure dialog, not env vars.
+setSetupKind('extension');
 
 /**
  * Local entry: an MCP client (Claude Desktop, an inspector) starts this process
