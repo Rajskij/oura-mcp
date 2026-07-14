@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "oura-mcp",
   "display_name": "oura-mcp",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Ask your Oura Ring about sleep, readiness, activity, stress and heart rate - in ChatGPT-grade chat, in any language.",
   "author": {
     "name": "Ihor Rajskij",
