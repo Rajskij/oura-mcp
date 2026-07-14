@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "oura-mcp",
   "display_name": "oura-mcp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Ask your Oura Ring about sleep, readiness, activity, stress and heart rate - in ChatGPT-grade chat, in any language.",
   "author": {
     "name": "Ihor Rajskij",
@@ -21,7 +21,9 @@
     "entry_point": "dist/src/stdio.js",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/dist/src/stdio.js"],
+      "args": [
+        "${__dirname}/dist/src/stdio.js"
+      ],
       "env": {
         "OURA_CLIENT_ID": "${user_config.oura_client_id}",
         "OURA_CLIENT_SECRET": "${user_config.oura_client_secret}"
@@ -46,10 +48,21 @@
     }
   },
   "compatibility": {
-    "platforms": ["darwin", "win32", "linux"],
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
     "runtimes": {
       "node": ">=18.0.0"
     }
   },
-  "keywords": ["oura", "oura-ring", "health", "sleep", "readiness", "mcp"]
+  "keywords": [
+    "oura",
+    "oura-ring",
+    "health",
+    "sleep",
+    "readiness",
+    "mcp"
+  ]
 }
