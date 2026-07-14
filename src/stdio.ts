@@ -12,6 +12,12 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
  * fail-fast boot on purpose — in production a broken secrets pipeline must
  * crash loudly, not silently serve fake data.
  */
+// An empty or unsubstituted ${user_config.*} template (extension host quirks)
+// must mean "no credentials", not a garbage client id.
+for (const key of ['OURA_CLIENT_ID', 'OURA_CLIENT_SECRET']) {
+  if (process.env[key]?.startsWith('${')) delete process.env[key];
+}
+
 if (!process.env.OURA_CLIENT_ID || !process.env.OURA_CLIENT_SECRET) {
   process.env.OURA_SANDBOX = '1';
   console.error(

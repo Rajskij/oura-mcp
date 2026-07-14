@@ -1,0 +1,55 @@
+{
+  "manifest_version": "0.3",
+  "name": "oura-mcp",
+  "display_name": "oura-mcp",
+  "version": "0.2.1",
+  "description": "Ask your Oura Ring about sleep, readiness, activity, stress and heart rate - in ChatGPT-grade chat, in any language.",
+  "author": {
+    "name": "Ihor Rajskij",
+    "url": "https://github.com/Rajskij"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rajskij/oura-mcp"
+  },
+  "homepage": "https://github.com/Rajskij/oura-mcp",
+  "documentation": "https://github.com/Rajskij/oura-mcp#readme",
+  "license": "MIT",
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/src/stdio.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/src/stdio.js"],
+      "env": {
+        "OURA_CLIENT_ID": "${user_config.oura_client_id}",
+        "OURA_CLIENT_SECRET": "${user_config.oura_client_secret}"
+      }
+    }
+  },
+  "user_config": {
+    "oura_client_id": {
+      "type": "string",
+      "title": "Oura app client ID",
+      "description": "From your own (free) Oura app at developer.ouraring.com/applications - register it with redirect URI http://localhost:8888/callback. Leave both fields empty to try the demo with fake sandbox data.",
+      "required": false,
+      "default": ""
+    },
+    "oura_client_secret": {
+      "type": "string",
+      "title": "Oura app client secret",
+      "description": "Client secret of the same Oura app. Stored in your OS keychain.",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "keywords": ["oura", "oura-ring", "health", "sleep", "readiness", "mcp"]
+}

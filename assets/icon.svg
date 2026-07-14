@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="0.5" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#101b30"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full-bleed background: the host (Claude Desktop) crops to a circle,
+       so all meaningful content stays well inside the inscribed circle. -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <g transform="rotate(-24 256 256)">
+    <ellipse cx="256" cy="256" rx="128" ry="128" fill="none" stroke="url(#ring)" stroke-width="28"/>
+    <ellipse cx="256" cy="256" rx="128" ry="128" fill="none" stroke="#e0f2fe" stroke-opacity="0.35" stroke-width="4" stroke-dasharray="150 660" stroke-dashoffset="-44" stroke-linecap="round"/>
+  </g>
+
+  <path d="M144 271 L204 271 L226 232 L252 306 L278 245 L295 271 L368 271"
+        fill="none" stroke="#f8fafc" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

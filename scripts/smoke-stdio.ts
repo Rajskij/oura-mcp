@@ -63,6 +63,9 @@ try {
   const content = result.content as Array<{ type: string; text?: string }>;
   const payload = JSON.parse(content[0]?.text ?? '{}');
   if (!Array.isArray(payload.days)) fail('oura_get_sleep payload has no days array');
+  if (typeof payload.sandbox_note !== 'string') {
+    fail('demo-mode response is missing the sandbox_note marker');
+  }
 
   console.log(`SMOKE-STDIO OK: ${names.length} tools, sleep days=${payload.days.length}`);
   await client.close();
