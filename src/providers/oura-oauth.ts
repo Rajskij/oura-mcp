@@ -15,11 +15,11 @@ export const REDIRECT_URI = `http://localhost:${OAUTH_PORT}/callback`;
 const SCOPES =
   'email personal daily heartrate workout tag session spo2 stress heart_health ring_configuration';
 
-export function buildAuthorizeUrl(clientId: string, state: string): URL {
+export function buildAuthorizeUrl(clientId: string, state: string, redirectUri: string): URL {
   const url = new URL('https://cloud.ouraring.com/oauth/authorize');
   url.searchParams.set('response_type', 'code');
   url.searchParams.set('client_id', clientId);
-  url.searchParams.set('redirect_uri', REDIRECT_URI);
+  url.searchParams.set('redirect_uri', redirectUri);
   url.searchParams.set('scope', SCOPES);
   url.searchParams.set('state', state);
   return url;
@@ -42,7 +42,7 @@ export function runOAuthFlow(
   options: OAuthFlowOptions = {},
 ): Promise<void> {
   const state = randomBytes(16).toString('hex');
-  const authorizeUrl = buildAuthorizeUrl(clientId, state);
+  const authorizeUrl = buildAuthorizeUrl(clientId, state, REDIRECT_URI);
 
   return new Promise((resolve, reject) => {
     const server = createServer(async (req, res) => {

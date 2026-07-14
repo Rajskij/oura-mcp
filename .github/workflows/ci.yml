@@ -49,6 +49,11 @@ jobs:
           cp assets/icon.png /tmp/manifest-check/icon.png
           npx --yes @anthropic-ai/mcpb@2.1.2 validate /tmp/manifest-check/manifest.json
 
+      # The worker is excluded from the Node build; wrangler's own bundler is
+      # what actually compiles it, so a dry-run deploy is its build check.
+      - name: Cloudflare Worker build check
+        run: npm run worker:check
+
       # Catches Dockerfile breakage before merge; publishing still happens
       # only from main (see the docker job below).
       - name: Docker build check

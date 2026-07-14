@@ -51,14 +51,17 @@ export function loadTokens(): OuraTokens {
   return JSON.parse(readFileSync(TOKENS_FILE, 'utf8')) as OuraTokens;
 }
 
-export async function exchangeToken(params: {
+export interface TokenRequest {
   grantType: 'authorization_code' | 'refresh_token';
   clientId: string;
   clientSecret: string;
   code?: string;
   redirectUri?: string;
   refreshToken?: string;
-}): Promise<OuraTokens> {
+}
+
+/** Exchange a code / refresh token at Oura. Pure: no storage side effects. */
+export async function requestToken(params: TokenRequest): Promise<OuraTokens> {
   const body = new URLSearchParams({
     grant_type: params.grantType,
     client_id: params.clientId,
@@ -82,11 +85,16 @@ export async function exchangeToken(params: {
     refresh_token: string;
     expires_in: number;
   };
-  const tokens: OuraTokens = {
+  return {
     access_token: json.access_token,
     refresh_token: json.refresh_token,
     expires_at: Date.now() + json.expires_in * 1000,
   };
+}
+
+/** requestToken + persist to the local token file (the Node/file-based flows). */
+export async function exchangeToken(params: TokenRequest): Promise<OuraTokens> {
+  const tokens = await requestToken(params);
   saveTokens(tokens);
   return tokens;
 }

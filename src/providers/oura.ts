@@ -23,7 +23,19 @@ function ouraApiBase(): string {
 }
 
 /** Refresh slightly before expiry so a request never rides an expiring token. */
-const EXPIRY_MARGIN_MS = 60_000;
+export const EXPIRY_MARGIN_MS = 60_000;
+
+export type AccessTokenProvider = () => Promise<string>;
+
+let accessTokenProvider: AccessTokenProvider | null = null;
+
+/**
+ * Runtimes without a filesystem (Cloudflare Workers) install their own token
+ * source; when set, it fully replaces the file-based token logic below.
+ */
+export function setAccessTokenProvider(provider: AccessTokenProvider): void {
+  accessTokenProvider = provider;
+}
 
 export class OuraApiError extends Error {
   constructor(
@@ -92,6 +104,7 @@ function startInteractiveAuth(): never {
 
 async function ensureAccessToken(): Promise<string> {
   if (isSandbox()) return 'sandbox';
+  if (accessTokenProvider) return accessTokenProvider();
   let tokens: ReturnType<typeof loadTokens>;
   try {
     tokens = loadTokens();

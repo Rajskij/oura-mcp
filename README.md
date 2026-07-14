@@ -127,7 +127,20 @@ Ask Claude "how did I sleep this week?" — you'll get answers from Oura's sandb
 
 Running from source instead of Docker: `npm install && npm run build`, then use `"command": "node", "args": ["/path/to/oura-mcp/dist/src/stdio.js"]` (with `cwd` at the repo so `data/tokens.json` resolves).
 
-## Self-hosting (remote: ChatGPT, claude.ai web)
+## Remote (ChatGPT, claude.ai web) — one-click deploy
+
+ChatGPT and claude.ai on the web can't run a local process; they need a public HTTPS URL. The fastest way to get one, free and with no server to manage, is Cloudflare Workers:
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Rajskij/oura-mcp)
+
+The button clones this repo into **your** Cloudflare account and deploys it — you get a `https://oura-mcp.<you>.workers.dev` address. During setup, set these secrets (or leave them unset for demo mode with fake data):
+
+- `MCP_PATH_SECRET` — a long random string (`openssl rand -hex 24`); your endpoint is `https://<host>/mcp/<MCP_PATH_SECRET>`
+- `OURA_CLIENT_ID`, `OURA_CLIENT_SECRET` — from [your Oura app](https://developer.ouraring.com/applications), whose redirect URI must be `https://<host>/oauth/callback`
+
+To connect your account, open `https://<host>/oauth/start?key=<MCP_PATH_SECRET>` once in a browser and approve. Then add `https://<host>/mcp/<MCP_PATH_SECRET>` as a connector in ChatGPT (Settings → Apps → Developer mode) or Claude. Tokens are stored server-side in a Durable Object, never exposed to the client. Free tier (100k requests/day, always-on, no cold starts) is far beyond personal use.
+
+## Self-hosting (your own VM)
 
 ### Docker (recommended)
 

@@ -15,3 +15,7 @@ docs/ROADMAP.md
 # misc
 *.log
 .DS_Store
+
+# Cloudflare Workers local secrets
+.dev.vars
+.wrangler/

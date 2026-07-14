@@ -19,7 +19,9 @@
     "lint:fix": "biome check --write .",
     "smoke": "tsx scripts/smoke.ts",
     "smoke:stdio": "tsx scripts/smoke-stdio.ts",
-    "get-token": "tsx scripts/get-token.ts"
+    "get-token": "tsx scripts/get-token.ts",
+    "worker:dev": "wrangler dev",
+    "worker:check": "wrangler deploy --dry-run --outdir /tmp/oura-mcp-worker"
   },
   "dependencies": {
     "@hono/mcp": "^0.3.0",
@@ -33,6 +35,7 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.23.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "wrangler": "^4.110.0"
   }
 }

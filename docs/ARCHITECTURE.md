@@ -39,8 +39,18 @@ would silently change the server's contract.
 
 **`src/server.ts`** — `buildServer()`, the **API boundary** between transport
 and domain. Takes no arguments, knows nothing about HTTP.
-*Invariant:* transport-agnostic — this is what makes the planned stdio
-(`.mcpb`) and Cloudflare Workers entries additions rather than rewrites.
+*Invariant:* transport-agnostic — this is what lets three entries share it:
+`src/index.ts` (remote HTTP on a Node host), `src/stdio.ts` (local, for
+Claude Desktop and the `.mcpb` bundle), and `src/worker/` (Cloudflare Workers).
+
+**`src/worker/`** — the Cloudflare Workers entry. Same Hono routes as the Node
+HTTP entry, but tokens live in a Durable Object (`OuraTokensDO`) instead of a
+file, and the OAuth consent redirect returns to `/oauth/callback` on the worker
+instead of localhost. *Invariant:* token refresh is serialized — Oura rotates
+the refresh token on every use, and the DO's single-threaded execution makes a
+two-concurrent-refreshes race (which would invalidate the token family)
+structurally impossible. The provider exposes a `setAccessTokenProvider` seam so
+this runtime supplies tokens from the DO instead of the filesystem.
 
 **`src/tools/`** — the product. Ten task-oriented tools grouped by the
 questions people ask, not by Oura's eighteen REST resources.

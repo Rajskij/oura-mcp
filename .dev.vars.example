@@ -1,0 +1,13 @@
+# Secrets for the Cloudflare Workers deployment.
+# Local dev: copy to .dev.vars. Production: `npx wrangler secret put <NAME>`
+# (the Deploy to Cloudflare flow prompts for these during setup).
+
+# Long random URL path segment — the access control for the MCP endpoint.
+# Generate with: openssl rand -hex 24
+MCP_PATH_SECRET=
+
+# Your Oura app credentials from https://developer.ouraring.com/applications.
+# Register the redirect URI: https://<your-worker-host>/oauth/callback
+# Leave unset and set OURA_SANDBOX=1 to serve fake demo data instead.
+OURA_CLIENT_ID=
+OURA_CLIENT_SECRET=
