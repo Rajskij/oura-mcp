@@ -40,8 +40,14 @@ jobs:
       - name: Smoke test stdio entry (demo fallback)
         run: npm run smoke:stdio
 
+      # Staged like the release job assembles the bundle: the validator also
+      # checks the icon, which lives at the bundle root, not the repo root.
       - name: Validate the Claude Desktop extension manifest
-        run: npx --yes @anthropic-ai/mcpb@2.1.2 validate manifest.json
+        run: |
+          mkdir -p /tmp/manifest-check
+          cp manifest.json /tmp/manifest-check/
+          cp assets/icon.png /tmp/manifest-check/icon.png
+          npx --yes @anthropic-ai/mcpb@2.1.2 validate /tmp/manifest-check/manifest.json
 
       # Catches Dockerfile breakage before merge; publishing still happens
       # only from main (see the docker job below).
