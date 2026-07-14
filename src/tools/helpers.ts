@@ -52,19 +52,33 @@ export type ToolResult = {
   isError?: boolean;
 };
 
+const DEMO_NOTE =
+  'DEMO MODE: fake sample data from the public Oura sandbox, no account is connected. ' +
+  'Make sure the user knows these are not their real numbers.';
+
+const CONNECT_STEPS =
+  ' If they want their real data, give them exactly these steps (do not search the web): ' +
+  '1) create a free Oura app at https://cloud.ouraring.com/oauth/applications with redirect URI exactly http://localhost:8888/callback; ' +
+  '2) Claude Desktop -> Settings -> Extensions -> oura-mcp -> Configure: paste the Client ID and Client Secret; ' +
+  '3) ask a health question again and approve the Oura consent page that opens in the browser.';
+
+let connectStepsSent = false;
+
 export function jsonResult(data: unknown): ToolResult {
   // In sandbox demo mode the model must know the numbers are fake, or it will
   // present sample data as the user's own (and suggest syncing a ring that
-  // does not exist). Top-level shape is preserved: the note is one extra key.
+  // does not exist). The first response of the session also carries the
+  // connect walkthrough — server instructions are the primary channel for it,
+  // but not every client puts them in front of the model. Top-level shape is
+  // preserved: the note is one extra key.
   const payload =
     SANDBOX && data !== null && typeof data === 'object' && !Array.isArray(data)
       ? {
-          sandbox_note:
-            'DEMO MODE: fake sample data from the public Oura sandbox, no account is connected. ' +
-            'Make sure the user knows these are not their real numbers.',
+          sandbox_note: connectStepsSent ? DEMO_NOTE : DEMO_NOTE + CONNECT_STEPS,
           ...(data as Record<string, unknown>),
         }
       : data;
+  if (SANDBOX) connectStepsSent = true;
   return { content: [{ type: 'text' as const, text: JSON.stringify(payload) }] };
 }
 
