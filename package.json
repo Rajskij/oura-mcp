@@ -37,5 +37,26 @@
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",
     "wrangler": "^4.110.0"
+  },
+  "cloudflare": {
+    "label": "oura-mcp",
+    "products": [
+      "Workers",
+      "Durable Objects"
+    ],
+    "categories": [
+      "ai"
+    ],
+    "bindings": {
+      "MCP_PATH_SECRET": {
+        "description": "A long random string that guards your endpoint (it becomes part of the URL). Generate one with `openssl rand -hex 24`. **Leave every field empty to deploy a demo with fake sample data.**"
+      },
+      "OURA_CLIENT_ID": {
+        "description": "Client ID of your own free Oura app from [developer.ouraring.com/applications](https://developer.ouraring.com/applications). Leave empty for demo mode."
+      },
+      "OURA_CLIENT_SECRET": {
+        "description": "Client secret of the same Oura app. After deploying, set its redirect URI to `https://<your-worker-url>/oauth/callback`."
+      }
+    }
   }
 }
