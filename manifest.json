@@ -32,7 +32,7 @@
     "oura_client_id": {
       "type": "string",
       "title": "Oura app client ID",
-      "description": "From your own (free) Oura app at cloud.ouraring.com - register it with redirect URI http://localhost:8888/callback. Leave both fields empty to try the demo with fake sandbox data.",
+      "description": "From your own (free) Oura app at developer.ouraring.com/applications - register it with redirect URI http://localhost:8888/callback. Leave both fields empty to try the demo with fake sandbox data.",
       "required": false,
       "default": ""
     },

@@ -80,7 +80,7 @@ No server to deploy: Claude Desktop starts oura-mcp itself as a local process.
 
 **Connect your real ring (~5 minutes):**
 
-1. Create your own Oura app (free, instant, no review) at [cloud.ouraring.com/oauth/applications](https://cloud.ouraring.com/oauth/applications) — set the redirect URI to exactly `http://localhost:8888/callback`
+1. Create your own Oura app (free, instant, no review) at [developer.ouraring.com/applications](https://developer.ouraring.com/applications) — set the redirect URI to exactly `http://localhost:8888/callback`
 2. In Claude Desktop: Settings → Extensions → oura-mcp → **Configure** → paste the app's Client ID and Client Secret (the secret is stored in your OS keychain)
 3. Ask Claude a health question — your browser opens the Oura consent page. Approve, ask again, and you're looking at your own data. Tokens stay on your machine (`~/.oura-mcp/`, chmod 600).
 
@@ -102,7 +102,7 @@ Ask Claude "how did I sleep this week?" — you'll get answers from Oura's sandb
 <details>
 <summary><b>Switch to your real account</b></summary>
 
-1. Register an OAuth app at cloud.ouraring.com (redirect URI `http://localhost:8888/callback`) and put the credentials in an `.env` file next to a copy of [docker-compose.yml](docker-compose.yml)
+1. Register an OAuth app at developer.ouraring.com/applications (redirect URI `http://localhost:8888/callback`) and put the credentials in an `.env` file next to a copy of [docker-compose.yml](docker-compose.yml)
 2. One-time browser consent, saves tokens to `./data`: `docker compose --profile setup up get-token`
 3. Point the same config at your credentials and tokens:
 
@@ -132,7 +132,7 @@ Running from source instead of Docker: `npm install && npm run build`, then use 
 ### Docker (recommended)
 
 ```bash
-# 1. Register an OAuth app at cloud.ouraring.com
+# 1. Register an OAuth app at developer.ouraring.com/applications
 #    Redirect URI: http://localhost:8888/callback
 
 # 2. Configure
@@ -155,7 +155,7 @@ Keep `PORT=3000` in `.env` (or adjust the compose port mapping to match).
 Needs Node 22+.
 
 ```bash
-# 1. Register an OAuth app at cloud.ouraring.com
+# 1. Register an OAuth app at developer.ouraring.com/applications
 #    Redirect URI: http://localhost:8888/callback
 
 # 2. Configure

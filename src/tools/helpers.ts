@@ -58,7 +58,7 @@ const DEMO_NOTE =
 
 const CONNECT_STEPS =
   ' If they want their real data, give them exactly these steps (do not search the web): ' +
-  '1) create a free Oura app at https://cloud.ouraring.com/oauth/applications with redirect URI exactly http://localhost:8888/callback; ' +
+  '1) create a free Oura app at https://developer.ouraring.com/applications with redirect URI exactly http://localhost:8888/callback; ' +
   '2) Claude Desktop -> Settings -> Extensions -> oura-mcp -> Configure: paste the Client ID and Client Secret; ' +
   '3) ask a health question again and approve the Oura consent page that opens in the browser.';
 
