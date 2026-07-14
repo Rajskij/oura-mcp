@@ -135,12 +135,12 @@ ChatGPT and claude.ai on the web can't run a local process; they need a public H
 
 The button clones this repo into **your** Cloudflare account and deploys it — you get a `https://oura-mcp.<you>.workers.dev` address.
 
-**Just trying it?** Deploy with the fields as-is — it runs in demo mode (fake sample data, no Oura account). Your endpoint is `https://<host>/mcp/<MCP_PATH_SECRET>`; add it as a connector in ChatGPT (Settings → Apps → Developer mode) or Claude.
+**Just trying it?** Click Deploy with the field as-is — it runs in demo mode (fake sample data, no Oura account). Your endpoint is `https://<host>/mcp/<MCP_PATH_SECRET>`; add it as a connector in ChatGPT (Settings → Apps → Developer mode) or Claude.
 
-**Connecting your real ring:**
+**Connecting your real ring** (after deploying — you need the worker's URL first):
 
-1. Replace `MCP_PATH_SECRET` with a long random string (`openssl rand -hex 24`) — the worker refuses to serve a real account under the shipped default.
-2. Set `OURA_CLIENT_ID` / `OURA_CLIENT_SECRET` from [your Oura app](https://developer.ouraring.com/applications), whose redirect URI must be `https://<host>/oauth/callback`.
+1. In the worker's dashboard (**Settings → Variables and Secrets**): replace `MCP_PATH_SECRET` with a long random string (`openssl rand -hex 24` — the worker refuses to serve a real account under the shipped default), and add `OURA_CLIENT_ID` / `OURA_CLIENT_SECRET` as secrets.
+2. Create your [Oura app](https://developer.ouraring.com/applications) with redirect URI `https://<host>/oauth/callback` (your worker's URL).
 3. Open `https://<host>/oauth/start?key=<MCP_PATH_SECRET>` once in a browser and approve.
 
 Tokens are stored server-side in a Durable Object, never exposed to the client. Free tier (100k requests/day, always-on, no cold starts) is far beyond personal use.

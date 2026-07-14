@@ -86,6 +86,21 @@ function realCredentials(env: Env): boolean {
   return !sandbox && !!env.OURA_CLIENT_ID && !!env.OURA_CLIENT_SECRET;
 }
 
+/**
+ * Mirror the stdio entry's demo fallback: with no Oura credentials configured,
+ * a bare deploy serves the sandbox instead of erroring. The shared provider
+ * reads OURA_SANDBOX from process.env (populated per-request on Workers), so
+ * set it from the binding before the server is built.
+ */
+function applyDemoMode(env: Env): void {
+  const explicit = env.OURA_SANDBOX === '1' || env.OURA_SANDBOX === 'true';
+  if (explicit || !env.OURA_CLIENT_ID || !env.OURA_CLIENT_SECRET) {
+    process.env.OURA_SANDBOX = '1';
+  } else {
+    delete process.env.OURA_SANDBOX;
+  }
+}
+
 function requireSecret(env: Env): string {
   const secret = env.MCP_PATH_SECRET;
   if (!secret) throw new HTTPException(500, { message: 'MCP_PATH_SECRET is not configured' });
@@ -105,6 +120,7 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.post('/mcp/:secret', async (c) => {
   if (c.req.param('secret') !== requireSecret(c.env)) return c.notFound();
+  applyDemoMode(c.env);
 
   // The provider closes over this request's origin so the "not connected yet"
   // message can point at the exact consent URL for this deployment.

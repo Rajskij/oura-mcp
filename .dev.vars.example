@@ -3,13 +3,13 @@
 # (the Deploy to Cloudflare flow prompts for these during setup).
 
 # Long random URL path segment — the access control for the MCP endpoint.
-# The default below is fine for the fake-data demo, but the worker REFUSES to
-# serve a real Oura account under it. Replace it (openssl rand -hex 24) before
-# connecting your account.
+# The default is fine for the fake-data demo, but the worker REFUSES to serve a
+# real Oura account under it. Replace it (openssl rand -hex 24) before connecting.
 MCP_PATH_SECRET=change-me-to-a-long-random-string
 
-# Your Oura app credentials from https://developer.ouraring.com/applications.
-# Register the redirect URI: https://<your-worker-host>/oauth/callback
-# Leave unset and set OURA_SANDBOX=1 to serve fake demo data instead.
-OURA_CLIENT_ID=
-OURA_CLIENT_SECRET=
+# Oura credentials are NOT set at deploy time on purpose: the Oura app's
+# redirect URI has to be your worker's URL, which only exists after the first
+# deploy. Add them afterwards as secrets (worker Settings, or `wrangler secret
+# put OURA_CLIENT_ID` / `OURA_CLIENT_SECRET`). For local dev, add them here.
+# OURA_CLIENT_ID=
+# OURA_CLIENT_SECRET=
