@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { OuraApiError, SANDBOX } from '../providers/oura.js';
+import { isSandbox, OuraApiError } from '../providers/oura.js';
 import { logUsage } from './logger.js';
 
 /** Shared plumbing for all tools: date defaults, unit conversion, result shaping. */
@@ -72,13 +72,13 @@ export function jsonResult(data: unknown): ToolResult {
   // but not every client puts them in front of the model. Top-level shape is
   // preserved: the note is one extra key.
   const payload =
-    SANDBOX && data !== null && typeof data === 'object' && !Array.isArray(data)
+    isSandbox() && data !== null && typeof data === 'object' && !Array.isArray(data)
       ? {
           sandbox_note: connectStepsSent ? DEMO_NOTE : DEMO_NOTE + CONNECT_STEPS,
           ...(data as Record<string, unknown>),
         }
       : data;
-  if (SANDBOX) connectStepsSent = true;
+  if (isSandbox()) connectStepsSent = true;
   return { content: [{ type: 'text' as const, text: JSON.stringify(payload) }] };
 }
 

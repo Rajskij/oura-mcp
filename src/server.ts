@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { SANDBOX } from './providers/oura.js';
+import { isSandbox } from './providers/oura.js';
 import { registerAllTools } from './tools/index.js';
 
 /**
@@ -23,7 +23,7 @@ export function buildServer(): McpServer {
   const server = new McpServer(
     // Version is kept in sync with releases by release-please (extra-files).
     { name: 'oura-mcp', version: '0.2.2' }, // x-release-please-version
-    { instructions: SANDBOX ? DEMO_INSTRUCTIONS : REAL_INSTRUCTIONS },
+    { instructions: isSandbox() ? DEMO_INSTRUCTIONS : REAL_INSTRUCTIONS },
   );
   registerAllTools(server);
   return server;

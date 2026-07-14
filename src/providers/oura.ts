@@ -9,12 +9,18 @@ import { exchangeToken, loadTokens } from './oura-tokens.js';
  * Sandbox mode (OURA_SANDBOX=1): hits Oura's sandbox with fake data and a dummy
  * token. No real account or subscription needed — used for local smoke tests.
  * Note: the sandbox has no personal_info endpoint; tools handle that gracefully.
+ *
+ * Read lazily on purpose: on Cloudflare Workers process.env is populated from
+ * bindings per request, not at module evaluation, and the stdio entry sets the
+ * variable before dynamically importing the server.
  */
-export const SANDBOX = process.env.OURA_SANDBOX === '1' || process.env.OURA_SANDBOX === 'true';
+export function isSandbox(): boolean {
+  return process.env.OURA_SANDBOX === '1' || process.env.OURA_SANDBOX === 'true';
+}
 
-const OURA_API_BASE = SANDBOX
-  ? 'https://api.ouraring.com/v2/sandbox'
-  : 'https://api.ouraring.com/v2';
+function ouraApiBase(): string {
+  return isSandbox() ? 'https://api.ouraring.com/v2/sandbox' : 'https://api.ouraring.com/v2';
+}
 
 /** Refresh slightly before expiry so a request never rides an expiring token. */
 const EXPIRY_MARGIN_MS = 60_000;
@@ -85,7 +91,7 @@ function startInteractiveAuth(): never {
 }
 
 async function ensureAccessToken(): Promise<string> {
-  if (SANDBOX) return 'sandbox';
+  if (isSandbox()) return 'sandbox';
   let tokens: ReturnType<typeof loadTokens>;
   try {
     tokens = loadTokens();
@@ -106,7 +112,7 @@ async function ensureAccessToken(): Promise<string> {
 
 export async function ouraGet<T>(path: string, params: Record<string, string> = {}): Promise<T> {
   const token = await ensureAccessToken();
-  const url = new URL(`${OURA_API_BASE}/${path}`);
+  const url = new URL(`${ouraApiBase()}/${path}`);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
   }
