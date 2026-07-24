@@ -2,11 +2,14 @@ name: uptime
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    # Hourly. GitHub throttles sub-hourly crons on low-activity repos anyway, so
+    # a tighter schedule is fiction; hourly is honest and less noisy.
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
   issues: write
+  actions: read
 
 jobs:
   ping:
@@ -21,18 +24,28 @@ jobs:
           done
           exit 1
 
-      - name: File an issue (once) on failure
+      # Only page when the outage survives two runs in a row (~an hour), not on a
+      # single 40s network blip between the runner and DuckDNS. The previous run's
+      # conclusion is the state store — no extra persistence needed.
+      - name: File an issue when the outage persists
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          OPEN=$(gh issue list --label uptime --state open --json number --jq 'length')
-          if [ "$OPEN" = "0" ]; then
-            gh issue create \
-              --title "Production healthz is down ($(date -u '+%Y-%m-%d %H:%M') UTC)" \
-              --label uptime \
-              --body "Three consecutive healthz checks failed from GitHub Actions. Check the box: service status, Caddy, DuckDNS IP, Oracle instance state. Close this issue once resolved."
-          else
-            echo "uptime issue already open, not filing another"
+          PREV=$(gh run list --workflow uptime.yml --limit 5 \
+                  --json status,conclusion \
+                  --jq 'first(.[] | select(.status == "completed") | .conclusion) // "none"')
+          if [ "$PREV" != "failure" ]; then
+            echo "first failing run (previous run was '$PREV') — waiting for a second failure before paging"
+            exit 0
           fi
+          OPEN=$(gh issue list --label uptime --state open --json number --jq 'length')
+          if [ "$OPEN" != "0" ]; then
+            echo "uptime issue already open, not filing another"
+            exit 0
+          fi
+          gh issue create \
+            --title "Production healthz is down ($(date -u '+%Y-%m-%d %H:%M') UTC)" \
+            --label uptime \
+            --body "healthz failed on two consecutive uptime runs (each run already retries 3x over ~40s), so this is a real outage, not a blip. Check the box: service status, Caddy, DuckDNS IP, Oracle instance state. Close this issue once resolved."
