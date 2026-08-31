@@ -56,7 +56,9 @@ jobs:
 
   deploy:
     # Ship to the production box only for commits that landed on main and passed checks.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Box terminated 2026-08-31, no deploy target. Restore the line below to re-enable:
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: false
     needs: checks
     runs-on: ubuntu-latest
     concurrency: production
