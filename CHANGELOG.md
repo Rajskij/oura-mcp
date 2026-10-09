@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.3](https://github.com/Rajskij/oura-mcp/compare/v0.2.2...v0.2.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* **deps:** clear fast-uri, hono and ip-address advisories ([#59](https://github.com/Rajskij/oura-mcp/issues/59)) ([de625c0](https://github.com/Rajskij/oura-mcp/commit/de625c04efd181b43c50cfa73d6eca57c13e8894))
+* **deps:** resolve fast-uri host-confusion advisory (GHSA-v2hh-gcrm-f6hx) ([#47](https://github.com/Rajskij/oura-mcp/issues/47)) ([6eca588](https://github.com/Rajskij/oura-mcp/commit/6eca5881fa65ede09a245974d6efdbadb2b756d5))
+
+
+### CI/CD
+
+* disable deploy job, production box is gone ([#58](https://github.com/Rajskij/oura-mcp/issues/58)) ([f53f36a](https://github.com/Rajskij/oura-mcp/commit/f53f36ae7c8c082993d49825c4c67b5f04935013))
+* **uptime:** page only on a persistent outage, run hourly ([#46](https://github.com/Rajskij/oura-mcp/issues/46)) ([ab2ec7e](https://github.com/Rajskij/oura-mcp/commit/ab2ec7e3f271478d6f34eca45c088359482a2273))
+
 ## [0.2.2](https://github.com/Rajskij/oura-mcp/compare/v0.2.1...v0.2.2) (2026-07-14)
 
 
